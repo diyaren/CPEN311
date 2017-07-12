@@ -1,0 +1,11 @@
+
+State Machine - |lab1|statemachine:sm|present_state
+Name present_state.0111 present_state.0110 present_state.0100 present_state.0011 present_state.0010 present_state.0001 present_state.0000 present_state.1000 
+present_state.0000 0 0 0 0 0 0 0 0 
+present_state.0001 0 0 0 0 0 1 1 0 
+present_state.0010 0 0 0 0 1 0 1 0 
+present_state.0011 0 0 0 1 0 0 1 0 
+present_state.0100 0 0 1 0 0 0 1 0 
+present_state.0110 0 1 0 0 0 0 1 0 
+present_state.0111 1 0 0 0 0 0 1 0 
+present_state.1000 0 0 0 0 0 0 1 1 

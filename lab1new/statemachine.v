@@ -1,0 +1,281 @@
+module statemachine ( slow_clock, resetb,
+                      dscore, pscore, pcard3,
+                      load_pcard1, load_pcard2,load_pcard3,
+                      load_dcard1, load_dcard2, load_dcard3,
+                      player_win_light, dealer_win_light);
+							 
+input slow_clock, resetb;
+input [3:0] dscore, pscore, pcard3;
+
+output load_pcard1, load_pcard2, load_pcard3;
+output load_dcard1, load_dcard2, load_dcard3;
+output player_win_light, dealer_win_light;
+
+reg load_pcard1, load_pcard2, load_pcard3;
+reg load_dcard1, load_dcard2, load_dcard3;
+reg player_win_light, dealer_win_light;
+
+  `define SW 4
+  
+  `define playercard1 4'b0000
+  `define playercard2 4'b0001
+  `define playercard3 4'b0010
+  
+  `define dealercard1 4'b0011
+  `define dealercard2 4'b0100
+  `define dealercard3 4'b0101
+
+  `define gameover    4'b0110
+  `define dealercard3_0to5 4'b0111
+  `define dealercard3_6to7 4'b1000
+  `define waitstate        4'b1001
+
+// The code describing your state machine will go here.  Remember that
+// a state machine consists of next state logic, output logic, and the 
+// registers that hold the state.  You will want to review your notes from
+// CPEN 211 or equivalent if you have forgotten how to write a state machine.
+
+
+reg [3:0] present_state;
+reg [3:0] next_state; 
+	
+always@(posedge slow_clock, negedge resetb)	begin
+
+if(resetb == 0)
+
+next_state = `waitstate;
+
+else 
+case(present_state)
+
+`playercard1 : 	begin
+	load_pcard1 = 1'b1;
+	load_pcard2 = 1'b0;	
+	load_pcard3 = 1'b0; 
+	load_dcard1 = 1'b0; 
+	load_dcard2 = 1'b0; 
+	load_dcard3 = 1'b0; 
+ 	next_state = `dealercard1;	
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+	
+end
+
+`dealercard1 : begin 
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b1;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b0;
+	next_state = `playercard2;	
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;	
+	end
+
+`playercard2 : begin
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b1;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b0;
+	next_state = `dealercard2;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+	end
+
+`dealercard2 : begin
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b1;
+	load_dcard3 = 1'b0;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+
+	if (pscore == 8 || pscore == 9)
+		next_state = `gameover;
+
+	else if (dscore == 8 || dscore == 9)	 
+		next_state = `gameover;
+	
+	else if (pscore >= 0 && pscore <= 5 )
+			
+		next_state = `playercard3;
+	
+	else	
+		next_state = `dealercard3_6to7;
+
+	end
+
+`playercard3: 	begin
+ 
+		load_pcard1 = 1'b0;
+		load_pcard2 = 1'b0;
+		load_pcard3 = 1'b1;
+		load_dcard1 = 1'b0;
+		load_dcard2 = 1'b0;
+		load_dcard3 = 1'b0;	
+		next_state = `dealercard3_0to5;
+		player_win_light = 1'b0; 
+		dealer_win_light = 1'b0;	
+	
+end
+
+`dealercard3_0to5 :	begin
+
+	if(dscore == 7)		begin
+	next_state = `gameover;
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b0;	
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+
+	end
+
+	else if  (dscore == 6 && (pcard3 == 6 || pcard3 == 7))		begin
+	
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b1;	
+	next_state = `gameover;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+
+	end
+
+	else if (dscore == 5 && (pcard3 == 4 || pcard3 == 5 || pcard3 == 6 || pcard3 == 7 )) 	begin
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b1;	
+	next_state = `gameover;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+
+	end
+
+	else if (dscore == 4 && (pcard3 == 2 || pcard3 == 3 || pcard3 == 4 || pcard3 == 5 || pcard3 == 6 || pcard3 == 7 )) begin
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b1;	
+	next_state = `gameover;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+
+	end
+
+	else if (dscore == 3 && pcard3 != 8)		begin
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b1;	
+	next_state = `gameover;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+
+	end
+	end
+
+`dealercard3_6to7 :	begin
+
+	if (dscore >= 0 && dscore <= 5)	begin
+	
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b1;	
+	next_state = `gameover;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+	
+	end
+
+	else		begin
+
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b0;		
+	next_state = `gameover;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+
+	end
+	end
+
+
+`gameover:	begin
+	
+	next_state = `waitstate;
+
+	if(pscore > dscore) begin
+	player_win_light = 1'b1; 
+	dealer_win_light = 1'b0;
+	end
+
+	else if(dscore > pscore)	begin
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b1;
+	end
+
+        else if(dscore == pscore)	begin
+	player_win_light = 1'b1; 
+	dealer_win_light = 1'b1;
+	end	
+
+	else 				begin
+        player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+	end
+
+	end
+
+`waitstate:  begin
+        
+        next_state= `waitstate;
+        
+        end 
+
+default : 				begin
+	load_pcard1 = 1'b0;
+	load_pcard2 = 1'b0;
+	load_pcard3 = 1'b0;
+	load_dcard1 = 1'b0;
+	load_dcard2 = 1'b0;
+	load_dcard3 = 1'b0;	
+	//next_state = `playercard1;
+	player_win_light = 1'b0; 
+	dealer_win_light = 1'b0;
+        next_state = `waitstate;
+					end
+
+endcase
+
+end
+
+always@ (posedge slow_clock)
+present_state <= next_state;
+
+endmodule
+			

@@ -1,0 +1,14 @@
+module primeNum(SWI, HEX);
+
+input [0:0] SWI;
+output [6:0] HEX;
+reg [6:0] HEX;
+						
+always_comb 
+   case (SWI)
+	   1'b1 : HEX = 7'b00001100; // PRIME
+	   1'b0 : HEX = 7'b10000110; //Composite
+	  default : HEX = 7'b10000110; // Composite
+		endcase	
+endmodule
+

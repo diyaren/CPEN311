@@ -1,0 +1,548 @@
+|lab1
+CLOCK_50 => fast_clock.IN1
+KEY[0] => slow_clock.IN2
+KEY[1] => ~NO_FANOUT~
+KEY[2] => ~NO_FANOUT~
+KEY[3] => resetb.IN2
+LEDR[0] << pscore[0].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[1] << pscore[1].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[2] << pscore[2].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[3] << pscore[3].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[4] << dscore[0].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[5] << dscore[1].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[6] << dscore[2].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[7] << dscore[3].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[8] << statemachine:sm.player_win_light
+LEDR[9] << statemachine:sm.dealer_win_light
+HEX5[0] << datapath:dp.HEX5
+HEX5[1] << datapath:dp.HEX5
+HEX5[2] << datapath:dp.HEX5
+HEX5[3] << datapath:dp.HEX5
+HEX5[4] << datapath:dp.HEX5
+HEX5[5] << datapath:dp.HEX5
+HEX5[6] << datapath:dp.HEX5
+HEX4[0] << datapath:dp.HEX4
+HEX4[1] << datapath:dp.HEX4
+HEX4[2] << datapath:dp.HEX4
+HEX4[3] << datapath:dp.HEX4
+HEX4[4] << datapath:dp.HEX4
+HEX4[5] << datapath:dp.HEX4
+HEX4[6] << datapath:dp.HEX4
+HEX3[0] << datapath:dp.HEX3
+HEX3[1] << datapath:dp.HEX3
+HEX3[2] << datapath:dp.HEX3
+HEX3[3] << datapath:dp.HEX3
+HEX3[4] << datapath:dp.HEX3
+HEX3[5] << datapath:dp.HEX3
+HEX3[6] << datapath:dp.HEX3
+HEX2[0] << datapath:dp.HEX2
+HEX2[1] << datapath:dp.HEX2
+HEX2[2] << datapath:dp.HEX2
+HEX2[3] << datapath:dp.HEX2
+HEX2[4] << datapath:dp.HEX2
+HEX2[5] << datapath:dp.HEX2
+HEX2[6] << datapath:dp.HEX2
+HEX1[0] << datapath:dp.HEX1
+HEX1[1] << datapath:dp.HEX1
+HEX1[2] << datapath:dp.HEX1
+HEX1[3] << datapath:dp.HEX1
+HEX1[4] << datapath:dp.HEX1
+HEX1[5] << datapath:dp.HEX1
+HEX1[6] << datapath:dp.HEX1
+HEX0[0] << datapath:dp.HEX0
+HEX0[1] << datapath:dp.HEX0
+HEX0[2] << datapath:dp.HEX0
+HEX0[3] << datapath:dp.HEX0
+HEX0[4] << datapath:dp.HEX0
+HEX0[5] << datapath:dp.HEX0
+HEX0[6] << datapath:dp.HEX0
+
+
+|lab1|datapath:dp
+slow_clock => slow_clock.IN6
+fast_clock => fast_clock.IN1
+resetb => resetb.IN7
+load_pcard1 => load_pcard1.IN1
+load_pcard2 => load_pcard2.IN1
+load_pcard3 => load_pcard3.IN1
+load_dcard1 => load_dcard1.IN1
+load_dcard2 => load_dcard2.IN1
+load_dcard3 => load_dcard3.IN1
+pcard3_out[0] <= pcard3_out[0].DB_MAX_OUTPUT_PORT_TYPE
+pcard3_out[1] <= pcard3_out[1].DB_MAX_OUTPUT_PORT_TYPE
+pcard3_out[2] <= pcard3_out[2].DB_MAX_OUTPUT_PORT_TYPE
+pcard3_out[3] <= pcard3_out[3].DB_MAX_OUTPUT_PORT_TYPE
+pscore_out[0] <= scorehand_p:comb_10.total
+pscore_out[1] <= scorehand_p:comb_10.total
+pscore_out[2] <= scorehand_p:comb_10.total
+pscore_out[3] <= scorehand_p:comb_10.total
+dscore_out[0] <= scorehand_d:comb_11.total
+dscore_out[1] <= scorehand_d:comb_11.total
+dscore_out[2] <= scorehand_d:comb_11.total
+dscore_out[3] <= scorehand_d:comb_11.total
+HEX5[0] <= card7seg_d3:comb_17.HEX5
+HEX5[1] <= card7seg_d3:comb_17.HEX5
+HEX5[2] <= card7seg_d3:comb_17.HEX5
+HEX5[3] <= card7seg_d3:comb_17.HEX5
+HEX5[4] <= card7seg_d3:comb_17.HEX5
+HEX5[5] <= card7seg_d3:comb_17.HEX5
+HEX5[6] <= card7seg_d3:comb_17.HEX5
+HEX4[0] <= card7seg_d2:comb_16.HEX4
+HEX4[1] <= card7seg_d2:comb_16.HEX4
+HEX4[2] <= card7seg_d2:comb_16.HEX4
+HEX4[3] <= card7seg_d2:comb_16.HEX4
+HEX4[4] <= card7seg_d2:comb_16.HEX4
+HEX4[5] <= card7seg_d2:comb_16.HEX4
+HEX4[6] <= card7seg_d2:comb_16.HEX4
+HEX3[0] <= card7seg_d1:comb_15.HEX3
+HEX3[1] <= card7seg_d1:comb_15.HEX3
+HEX3[2] <= card7seg_d1:comb_15.HEX3
+HEX3[3] <= card7seg_d1:comb_15.HEX3
+HEX3[4] <= card7seg_d1:comb_15.HEX3
+HEX3[5] <= card7seg_d1:comb_15.HEX3
+HEX3[6] <= card7seg_d1:comb_15.HEX3
+HEX2[0] <= card7seg_p3:comb_14.HEX2
+HEX2[1] <= card7seg_p3:comb_14.HEX2
+HEX2[2] <= card7seg_p3:comb_14.HEX2
+HEX2[3] <= card7seg_p3:comb_14.HEX2
+HEX2[4] <= card7seg_p3:comb_14.HEX2
+HEX2[5] <= card7seg_p3:comb_14.HEX2
+HEX2[6] <= card7seg_p3:comb_14.HEX2
+HEX1[0] <= card7seg_p2:comb_13.HEX1
+HEX1[1] <= card7seg_p2:comb_13.HEX1
+HEX1[2] <= card7seg_p2:comb_13.HEX1
+HEX1[3] <= card7seg_p2:comb_13.HEX1
+HEX1[4] <= card7seg_p2:comb_13.HEX1
+HEX1[5] <= card7seg_p2:comb_13.HEX1
+HEX1[6] <= card7seg_p2:comb_13.HEX1
+HEX0[0] <= card7seg_p1:comb_12.HEX0
+HEX0[1] <= card7seg_p1:comb_12.HEX0
+HEX0[2] <= card7seg_p1:comb_12.HEX0
+HEX0[3] <= card7seg_p1:comb_12.HEX0
+HEX0[4] <= card7seg_p1:comb_12.HEX0
+HEX0[5] <= card7seg_p1:comb_12.HEX0
+HEX0[6] <= card7seg_p1:comb_12.HEX0
+
+
+|lab1|datapath:dp|dealcard:comb_3
+clock => dealer_card[0].CLK
+clock => dealer_card[1].CLK
+clock => dealer_card[2].CLK
+clock => dealer_card[3].CLK
+resetb => dealer_card[0].PRESET
+resetb => dealer_card[1].ACLR
+resetb => dealer_card[2].ACLR
+resetb => dealer_card[3].ACLR
+new_card[0] <= dealer_card[0].DB_MAX_OUTPUT_PORT_TYPE
+new_card[1] <= dealer_card[1].DB_MAX_OUTPUT_PORT_TYPE
+new_card[2] <= dealer_card[2].DB_MAX_OUTPUT_PORT_TYPE
+new_card[3] <= dealer_card[3].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|reg4_playercard1:comb_4
+new_card1[0] => player_card[0].DATAIN
+new_card1[1] => player_card[1].DATAIN
+new_card1[2] => player_card[2].DATAIN
+new_card1[3] => player_card[3].DATAIN
+load_pcard1 => always0.IN0
+resetb => always0.IN1
+resetb => player_card[0].ACLR
+resetb => player_card[1].ACLR
+resetb => player_card[2].ACLR
+resetb => player_card[3].ACLR
+slow_clock => player_card[0].CLK
+slow_clock => player_card[1].CLK
+slow_clock => player_card[2].CLK
+slow_clock => player_card[3].CLK
+player_card1[0] <= player_card[0].DB_MAX_OUTPUT_PORT_TYPE
+player_card1[1] <= player_card[1].DB_MAX_OUTPUT_PORT_TYPE
+player_card1[2] <= player_card[2].DB_MAX_OUTPUT_PORT_TYPE
+player_card1[3] <= player_card[3].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|reg4_playercard2:comb_5
+new_card2[0] => player_card[0].DATAIN
+new_card2[1] => player_card[1].DATAIN
+new_card2[2] => player_card[2].DATAIN
+new_card2[3] => player_card[3].DATAIN
+load_pcard2 => always0.IN0
+resetb => always0.IN1
+resetb => player_card[0].ACLR
+resetb => player_card[1].ACLR
+resetb => player_card[2].ACLR
+resetb => player_card[3].ACLR
+slow_clock => player_card[0].CLK
+slow_clock => player_card[1].CLK
+slow_clock => player_card[2].CLK
+slow_clock => player_card[3].CLK
+player_card2[0] <= player_card[0].DB_MAX_OUTPUT_PORT_TYPE
+player_card2[1] <= player_card[1].DB_MAX_OUTPUT_PORT_TYPE
+player_card2[2] <= player_card[2].DB_MAX_OUTPUT_PORT_TYPE
+player_card2[3] <= player_card[3].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|reg4_playercard3:comb_6
+new_card3[0] => player_card[0].DATAIN
+new_card3[1] => player_card[1].DATAIN
+new_card3[2] => player_card[2].DATAIN
+new_card3[3] => player_card[3].DATAIN
+load_pcard3 => always0.IN0
+resetb => always0.IN1
+resetb => player_card[0].ACLR
+resetb => player_card[1].ACLR
+resetb => player_card[2].ACLR
+resetb => player_card[3].ACLR
+slow_clock => player_card[0].CLK
+slow_clock => player_card[1].CLK
+slow_clock => player_card[2].CLK
+slow_clock => player_card[3].CLK
+player_card3[0] <= player_card[0].DB_MAX_OUTPUT_PORT_TYPE
+player_card3[1] <= player_card[1].DB_MAX_OUTPUT_PORT_TYPE
+player_card3[2] <= player_card[2].DB_MAX_OUTPUT_PORT_TYPE
+player_card3[3] <= player_card[3].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|reg4_dealercard1:comb_7
+new_card4[0] => dealer_card[0].DATAIN
+new_card4[1] => dealer_card[1].DATAIN
+new_card4[2] => dealer_card[2].DATAIN
+new_card4[3] => dealer_card[3].DATAIN
+load_dcard1 => always0.IN0
+resetb => always0.IN1
+resetb => dealer_card[0].ACLR
+resetb => dealer_card[1].ACLR
+resetb => dealer_card[2].ACLR
+resetb => dealer_card[3].ACLR
+slow_clock => dealer_card[0].CLK
+slow_clock => dealer_card[1].CLK
+slow_clock => dealer_card[2].CLK
+slow_clock => dealer_card[3].CLK
+dealer_card1[0] <= dealer_card[0].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card1[1] <= dealer_card[1].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card1[2] <= dealer_card[2].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card1[3] <= dealer_card[3].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|reg4_dealercard2:comb_8
+new_card5[0] => dealer_card[0].DATAIN
+new_card5[1] => dealer_card[1].DATAIN
+new_card5[2] => dealer_card[2].DATAIN
+new_card5[3] => dealer_card[3].DATAIN
+load_dcard2 => always0.IN0
+resetb => always0.IN1
+resetb => dealer_card[0].ACLR
+resetb => dealer_card[1].ACLR
+resetb => dealer_card[2].ACLR
+resetb => dealer_card[3].ACLR
+slow_clock => dealer_card[0].CLK
+slow_clock => dealer_card[1].CLK
+slow_clock => dealer_card[2].CLK
+slow_clock => dealer_card[3].CLK
+dealer_card2[0] <= dealer_card[0].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card2[1] <= dealer_card[1].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card2[2] <= dealer_card[2].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card2[3] <= dealer_card[3].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|reg4_dealercard3:comb_9
+new_card6[0] => dealer_card[0].DATAIN
+new_card6[1] => dealer_card[1].DATAIN
+new_card6[2] => dealer_card[2].DATAIN
+new_card6[3] => dealer_card[3].DATAIN
+load_dcard3 => always0.IN0
+resetb => always0.IN1
+resetb => dealer_card[0].ACLR
+resetb => dealer_card[1].ACLR
+resetb => dealer_card[2].ACLR
+resetb => dealer_card[3].ACLR
+slow_clock => dealer_card[0].CLK
+slow_clock => dealer_card[1].CLK
+slow_clock => dealer_card[2].CLK
+slow_clock => dealer_card[3].CLK
+dealer_card3[0] <= dealer_card[0].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card3[1] <= dealer_card[1].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card3[2] <= dealer_card[2].DB_MAX_OUTPUT_PORT_TYPE
+dealer_card3[3] <= dealer_card[3].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|scorehand_p:comb_10
+card1[0] => Decoder3.IN3
+card1[1] => Decoder0.IN2
+card1[1] => Decoder2.IN1
+card1[1] => Decoder3.IN2
+card1[2] => Decoder0.IN1
+card1[2] => Decoder1.IN1
+card1[2] => Decoder3.IN1
+card1[3] => Decoder0.IN0
+card1[3] => Decoder1.IN0
+card1[3] => Decoder2.IN0
+card1[3] => Decoder3.IN0
+card2[0] => Decoder7.IN3
+card2[1] => Decoder4.IN2
+card2[1] => Decoder6.IN1
+card2[1] => Decoder7.IN2
+card2[2] => Decoder4.IN1
+card2[2] => Decoder5.IN1
+card2[2] => Decoder7.IN1
+card2[3] => Decoder4.IN0
+card2[3] => Decoder5.IN0
+card2[3] => Decoder6.IN0
+card2[3] => Decoder7.IN0
+card3[0] => Decoder11.IN3
+card3[1] => Decoder8.IN2
+card3[1] => Decoder10.IN1
+card3[1] => Decoder11.IN2
+card3[2] => Decoder8.IN1
+card3[2] => Decoder9.IN1
+card3[2] => Decoder11.IN1
+card3[3] => Decoder8.IN0
+card3[3] => Decoder9.IN0
+card3[3] => Decoder10.IN0
+card3[3] => Decoder11.IN0
+total[0] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+total[1] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+total[2] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+total[3] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|scorehand_d:comb_11
+card1[0] => Decoder3.IN3
+card1[1] => Decoder0.IN2
+card1[1] => Decoder2.IN1
+card1[1] => Decoder3.IN2
+card1[2] => Decoder0.IN1
+card1[2] => Decoder1.IN1
+card1[2] => Decoder3.IN1
+card1[3] => Decoder0.IN0
+card1[3] => Decoder1.IN0
+card1[3] => Decoder2.IN0
+card1[3] => Decoder3.IN0
+card2[0] => Decoder7.IN3
+card2[1] => Decoder4.IN2
+card2[1] => Decoder6.IN1
+card2[1] => Decoder7.IN2
+card2[2] => Decoder4.IN1
+card2[2] => Decoder5.IN1
+card2[2] => Decoder7.IN1
+card2[3] => Decoder4.IN0
+card2[3] => Decoder5.IN0
+card2[3] => Decoder6.IN0
+card2[3] => Decoder7.IN0
+card3[0] => Decoder11.IN3
+card3[1] => Decoder8.IN2
+card3[1] => Decoder10.IN1
+card3[1] => Decoder11.IN2
+card3[2] => Decoder8.IN1
+card3[2] => Decoder9.IN1
+card3[2] => Decoder11.IN1
+card3[3] => Decoder8.IN0
+card3[3] => Decoder9.IN0
+card3[3] => Decoder10.IN0
+card3[3] => Decoder11.IN0
+total[0] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+total[1] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+total[2] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+total[3] <= Mod0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|card7seg_p1:comb_12
+player_card1[0] => Decoder0.IN3
+player_card1[1] => Decoder0.IN2
+player_card1[2] => Decoder0.IN1
+player_card1[3] => Decoder0.IN0
+HEX0[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+HEX0[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+HEX0[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+HEX0[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+HEX0[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+HEX0[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+HEX0[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|card7seg_p2:comb_13
+player_card2[0] => Decoder0.IN3
+player_card2[1] => Decoder0.IN2
+player_card2[2] => Decoder0.IN1
+player_card2[3] => Decoder0.IN0
+HEX1[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+HEX1[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+HEX1[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+HEX1[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+HEX1[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+HEX1[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+HEX1[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|card7seg_p3:comb_14
+player_card3[0] => Decoder0.IN3
+player_card3[1] => Decoder0.IN2
+player_card3[2] => Decoder0.IN1
+player_card3[3] => Decoder0.IN0
+HEX2[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+HEX2[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+HEX2[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+HEX2[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+HEX2[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+HEX2[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+HEX2[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|card7seg_d1:comb_15
+dealer_card1[0] => Decoder0.IN3
+dealer_card1[1] => Decoder0.IN2
+dealer_card1[2] => Decoder0.IN1
+dealer_card1[3] => Decoder0.IN0
+HEX3[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+HEX3[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+HEX3[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+HEX3[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+HEX3[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+HEX3[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+HEX3[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|card7seg_d2:comb_16
+dealer_card2[0] => Decoder0.IN3
+dealer_card2[1] => Decoder0.IN2
+dealer_card2[2] => Decoder0.IN1
+dealer_card2[3] => Decoder0.IN0
+HEX4[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+HEX4[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+HEX4[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+HEX4[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+HEX4[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+HEX4[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+HEX4[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|datapath:dp|card7seg_d3:comb_17
+dealer_card3[0] => Decoder0.IN3
+dealer_card3[1] => Decoder0.IN2
+dealer_card3[2] => Decoder0.IN1
+dealer_card3[3] => Decoder0.IN0
+HEX5[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+HEX5[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+HEX5[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+HEX5[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+HEX5[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+HEX5[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+HEX5[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|lab1|statemachine:sm
+slow_clock => present_state~1.DATAIN
+resetb => next_state.0000.IN1
+dscore[0] => LessThan2.IN8
+dscore[0] => LessThan3.IN8
+dscore[0] => LessThan4.IN4
+dscore[0] => LessThan5.IN4
+dscore[0] => Equal16.IN3
+dscore[0] => Equal2.IN31
+dscore[0] => Equal3.IN1
+dscore[0] => Equal4.IN2
+dscore[0] => Equal5.IN31
+dscore[0] => Equal8.IN1
+dscore[0] => Equal11.IN31
+dscore[0] => Equal14.IN1
+dscore[1] => LessThan2.IN7
+dscore[1] => LessThan3.IN7
+dscore[1] => LessThan4.IN3
+dscore[1] => LessThan5.IN3
+dscore[1] => Equal16.IN2
+dscore[1] => Equal2.IN30
+dscore[1] => Equal3.IN31
+dscore[1] => Equal4.IN1
+dscore[1] => Equal5.IN1
+dscore[1] => Equal8.IN31
+dscore[1] => Equal11.IN30
+dscore[1] => Equal14.IN0
+dscore[2] => LessThan2.IN6
+dscore[2] => LessThan3.IN6
+dscore[2] => LessThan4.IN2
+dscore[2] => LessThan5.IN2
+dscore[2] => Equal16.IN1
+dscore[2] => Equal2.IN29
+dscore[2] => Equal3.IN30
+dscore[2] => Equal4.IN0
+dscore[2] => Equal5.IN0
+dscore[2] => Equal8.IN0
+dscore[2] => Equal11.IN0
+dscore[2] => Equal14.IN31
+dscore[3] => LessThan2.IN5
+dscore[3] => LessThan3.IN5
+dscore[3] => LessThan4.IN1
+dscore[3] => LessThan5.IN1
+dscore[3] => Equal16.IN0
+dscore[3] => Equal2.IN0
+dscore[3] => Equal3.IN0
+dscore[3] => Equal4.IN31
+dscore[3] => Equal5.IN30
+dscore[3] => Equal8.IN30
+dscore[3] => Equal11.IN29
+dscore[3] => Equal14.IN30
+pscore[0] => LessThan0.IN8
+pscore[0] => LessThan1.IN8
+pscore[0] => LessThan4.IN8
+pscore[0] => LessThan5.IN8
+pscore[0] => Equal16.IN7
+pscore[0] => Equal0.IN31
+pscore[0] => Equal1.IN1
+pscore[1] => LessThan0.IN7
+pscore[1] => LessThan1.IN7
+pscore[1] => LessThan4.IN7
+pscore[1] => LessThan5.IN7
+pscore[1] => Equal16.IN6
+pscore[1] => Equal0.IN30
+pscore[1] => Equal1.IN31
+pscore[2] => LessThan0.IN6
+pscore[2] => LessThan1.IN6
+pscore[2] => LessThan4.IN6
+pscore[2] => LessThan5.IN6
+pscore[2] => Equal16.IN5
+pscore[2] => Equal0.IN29
+pscore[2] => Equal1.IN30
+pscore[3] => LessThan0.IN5
+pscore[3] => LessThan1.IN5
+pscore[3] => LessThan4.IN5
+pscore[3] => LessThan5.IN5
+pscore[3] => Equal16.IN4
+pscore[3] => Equal0.IN0
+pscore[3] => Equal1.IN0
+pcard3[0] => Equal6.IN31
+pcard3[0] => Equal7.IN2
+pcard3[0] => Equal9.IN31
+pcard3[0] => Equal10.IN1
+pcard3[0] => Equal12.IN31
+pcard3[0] => Equal13.IN1
+pcard3[0] => Equal15.IN31
+pcard3[1] => Equal6.IN1
+pcard3[1] => Equal7.IN1
+pcard3[1] => Equal9.IN30
+pcard3[1] => Equal10.IN31
+pcard3[1] => Equal12.IN0
+pcard3[1] => Equal13.IN0
+pcard3[1] => Equal15.IN30
+pcard3[2] => Equal6.IN0
+pcard3[2] => Equal7.IN0
+pcard3[2] => Equal9.IN0
+pcard3[2] => Equal10.IN0
+pcard3[2] => Equal12.IN30
+pcard3[2] => Equal13.IN31
+pcard3[2] => Equal15.IN29
+pcard3[3] => Equal6.IN30
+pcard3[3] => Equal7.IN31
+pcard3[3] => Equal9.IN29
+pcard3[3] => Equal10.IN30
+pcard3[3] => Equal12.IN29
+pcard3[3] => Equal13.IN30
+pcard3[3] => Equal15.IN0
+load_pcard1 <= load_pcard1$latch.DB_MAX_OUTPUT_PORT_TYPE
+load_pcard2 <= load_pcard2$latch.DB_MAX_OUTPUT_PORT_TYPE
+load_pcard3 <= load_pcard3$latch.DB_MAX_OUTPUT_PORT_TYPE
+load_dcard1 <= load_dcard1$latch.DB_MAX_OUTPUT_PORT_TYPE
+load_dcard2 <= load_dcard2$latch.DB_MAX_OUTPUT_PORT_TYPE
+load_dcard3 <= load_dcard3$latch.DB_MAX_OUTPUT_PORT_TYPE
+player_win_light <= player_win_light$latch.DB_MAX_OUTPUT_PORT_TYPE
+dealer_win_light <= dealer_win_light$latch.DB_MAX_OUTPUT_PORT_TYPE
+
+

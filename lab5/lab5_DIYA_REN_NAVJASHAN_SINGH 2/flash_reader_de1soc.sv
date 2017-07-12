@@ -1,0 +1,222 @@
+module lab5( CLOCK_50, CLOCK2_50, KEY,SW,
+             AUD_DACLRCK, AUD_ADCLRCK, 
+             AUD_BCLK,AUD_ADCDAT,FPGA_I2C_SDAT, 
+             FPGA_I2C_SCLK,AUD_DACDAT,AUD_XCK);
+   
+//must use blocking for this task
+input CLOCK_50,CLOCK2_50,AUD_DACLRCK, AUD_ADCLRCK, AUD_BCLK,AUD_ADCDAT;
+input [3:0] KEY;
+inout FPGA_I2C_SDAT;
+output FPGA_I2C_SCLK,AUD_DACDAT,AUD_XCK;
+input [9:0] SW;
+   
+
+wire clk, resetb;
+
+assign clk = CLOCK_50;
+assign resetb = KEY[3];
+
+wire            flash_mem_read;
+wire            flash_mem_waitrequest;
+wire    [22:0]  flash_mem_address;
+wire    [31:0]  flash_mem_readdata;
+wire            flash_mem_readdatavalid;
+wire    [3:0]   flash_mem_byteenable;
+flash flash_inst (
+    .clk_clk                 (clk),
+    .reset_reset_n           (resetb),
+    .flash_mem_write         (1'b0),
+    .flash_mem_burstcount    (1'b1),
+    .flash_mem_waitrequest   (flash_mem_waitrequest),
+    .flash_mem_read          (flash_mem_read),
+    .flash_mem_address       (flash_mem_address),
+    .flash_mem_writedata     (),
+    .flash_mem_readdata      (flash_mem_readdata),
+    .flash_mem_readdatavalid (flash_mem_readdatavalid),
+    .flash_mem_byteenable    (flash_mem_byteenable)
+);
+//flash memory setting 
+assign flash_mem_byteenable = 4'b1111;
+assign flash_mem_write = 1'b0;
+assign flash_mem_writedata = 32'b0; 
+assign flash_mem_burstcount = 6'b000001;
+
+typedef enum {state_send_sample,initial_state, start_reading_state,readdatavalid_state,getsample_state,writebacksample1_state,writebacksample2_state,set_bounding_state,end_state,state_wait_for_accepted,state_wait_until_ready,wait_state}state_type;
+state_type state;
+
+
+// signals that are used to communicate with the audio core
+reg read_ready, write_ready, write_s;
+reg [15:0] writedata_left, writedata_right;
+reg [15:0] readdata_left, readdata_right;	
+wire reset, read_s;
+
+reg mode;
+   
+//sample read from flash memory
+reg [31:0] sample;
+reg signed[15:0] playsample;
+   
+integer i,j;
+   
+
+    
+// instantiate the parts of the audio core. 
+clock_generator my_clock_gen (CLOCK2_50, reset, AUD_XCK);
+audio_and_video_config cfg (CLOCK_50, reset, FPGA_I2C_SDAT, FPGA_I2C_SCLK);
+audio_codec codec (CLOCK_50,reset,read_s,write_s,writedata_left, writedata_right,AUD_ADCDAT,AUD_BCLK,AUD_ADCLRCK,AUD_DACLRCK,read_ready, write_ready,readdata_left, readdata_right,AUD_DACDAT);
+
+   
+// we will never read from the microphone in this lab, so we might as well set read_s to 0.
+assign read_s = 1'b0;
+
+
+
+
+//for challenge part
+//use switches to control mode
+always @(SW)begin
+  case(SW)
+    9'b000000001:mode = 1'b1;//fast
+    9'b000000010:mode = 1'b0;//normal 
+	 default: mode = 1'b0;//which is normal 
+  endcase // case
+ end
+   
+
+
+   
+always_ff @(posedge CLOCK_50,negedge KEY[3] )begin
+if(KEY[3]==0)begin  
+   state= initial_state;
+   
+   
+end else begin
+ 
+case(state)
+
+
+initial_state:begin
+   flash_mem_address = 23'b0;
+   flash_mem_read =1'b0;
+   i = 0;
+   j=1;
+   write_s<=1'b0;
+   state<=start_reading_state;
+   
+   
+end
+  
+start_reading_state:begin
+ 
+  
+   flash_mem_read = 1'b1;
+   state<=wait_state;
+
+end 
+
+wait_state:begin
+   if(flash_mem_readdatavalid==1'b0)begin
+      state<=wait_state;
+   end
+   else if(flash_mem_readdatavalid==1'b1)begin
+      state<=readdatavalid_state;
+   end
+
+end
+  
+readdatavalid_state:begin
+  
+   flash_mem_read = 1'b0;
+   state<=getsample_state;
+
+
+end
+
+
+getsample_state:begin
+ 
+ 
+   sample = flash_mem_readdata;
+   
+   state<=set_bounding_state;
+   
+   
+end   
+
+  
+set_bounding_state:begin
+  
+   i=i+1'b1 ;
+   //read two sample at a time, so the counter should be 128 rather than 256
+   //read the whole stuff 1048676         2097432
+   if(i<104876)begin
+      flash_mem_address = flash_mem_address + 1'b1;
+      state<=state_wait_until_ready;
+      end
+   else begin
+      flash_mem_address=23'b0;
+      flash_mem_read=1'b0;
+      i=0;
+      state<=state_wait_until_ready;
+      
+   end  
+end
+state_wait_until_ready:begin
+      write_s <= 1'b0;
+      if (write_ready == 1'b1)  
+         state <= state_send_sample;
+
+end
+state_send_sample:begin
+
+   //set fast mode
+  if(mode == 1)	begin
+
+  playsample = sample[15:0];
+						
+  end else begin
+     
+  if(j==1)begin
+     playsample= sample[15:0];
+  end else begin
+     playsample= sample[31:16];
+  end
+   write_s<=1'b1;
+ //volumn 
+ playsample = playsample/64;
+  writedata_right<=playsample;
+  writedata_left<=playsample;
+  state<=state_wait_for_accepted;
+end // else: !if(mode == 1)
+   
+end // case: state_send_sample
+  
+  
+state_wait_for_accepted:begin
+    if(mode == 1)begin
+
+    	state <= start_reading_state;
+    end
+   
+else begin
+  if(write_ready==1'b0)begin
+     if(j==1)begin
+       j=2;
+    state<=state_wait_until_ready;
+    end else begin
+	 j=1;
+	state<=start_reading_state;
+	
+    end
+     
+  end // if (write_ready==1'b0)
+end // else: !if(mode == 1)
+   
+end      
+      		    
+endcase 
+end	      
+end 
+endmodule
+

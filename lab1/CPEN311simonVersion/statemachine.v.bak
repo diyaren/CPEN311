@@ -1,0 +1,242 @@
+module statemachine ( slow_clock, resetb,
+                      dscore, pscore, pcard3,
+                      load_pcard1, load_pcard2,load_pcard3,
+                      load_dcard1, load_dcard2, load_dcard3,
+                      player_win_light, dealer_win_light,clearboard);
+							 
+input slow_clock, resetb;
+input [3:0] dscore, pscore, pcard3;
+output load_pcard1, load_pcard2, load_pcard3;
+output load_dcard1, load_dcard2, load_dcard3;
+output player_win_light, dealer_win_light,clearboard;
+
+// The code describing your state machine will go here.  Remember that
+// a state machine consists of next state logic, output logic, and the 
+// registers that hold the state.  You will want to review your notes from
+// CPEN 211 or equivalent if you have forgotten how to write a state machine.
+
+reg load_pcard1, load_pcard2, load_pcard3;
+reg load_dcard1, load_dcard2, load_dcard3;
+reg player_win_light, dealer_win_light,clearboard;
+
+//wire [3:0] temp_state;
+reg [3:0] next_state;
+reg [3:0] current_state;
+`define WAIT  4'b0000
+`define PC1   4'b0001
+`define PC2   4'b0010
+`define PC3   4'b0011
+`define DC1   4'b0100
+`define DC2   4'b0101
+`define DC3   4'b0110
+`define TIE   4'b0111
+`define PWIN  4'b1000
+`define DWIN  4'b1001
+`define CLEAR 4'b1011
+
+//assign temp_state = resetb ? `WAIT : next_state;
+//vDFF #(3) DFF2(slow_clock,next_state,current_state);
+always @(posedge slow_clock or posedge resetb)
+  current_state = next_state;
+
+always @(negedge slow_clock or negedge resetb) begin
+  if(resetb == 0)
+  	{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`WAIT,9'b000000000};
+  else begin
+  case (current_state)
+    `WAIT: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`PC1,9'b100000000};
+    `PC1:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`DC1,9'b000100000};
+    `DC1:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`PC2,9'b010000000};
+    `PC2:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`DC2,9'b000010000};
+    `DC2:  clearboard = 1'b0;
+	   if (pscore==8 || pscore==9 || dscore==8 || dscore==9) begin
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+		end
+	   else if (pscore >= 0 && pscore <= 5)
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PC3,8'b00100000};
+	   else	begin
+		if (dscore >= 0 && dscore <= 5)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00000100};
+		else begin
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+		end
+		end   
+    `PC3:  clearboard = 1'b0;
+	   if (dscore == 7) begin
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+		end
+	   else if (dscore == 6) begin
+		if (pcard3 == 6 || pcard3 == 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00000100};
+                else begin
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};					
+		end
+		end
+	   else if (dscore == 5) begin
+		if (pcard3 >= 4 && pcard3 <= 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00000100};
+                else begin
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+		end
+		end
+	   else if (dscore == 4) begin
+		if (pcard3 >= 2 && pcard3 <= 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00000100};
+                else begin
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+		end
+		end
+	   else if (dscore == 3) begin
+		if (pcard3 >= 0 && pcard3 <= 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00000100};
+                else begin
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+		end
+		end
+	   else 
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00000100};
+	  
+
+    `DC3:  clearboard = 1'b0;
+	   if(pscore > dscore)
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+	   else if (pscore < dscore)
+	 	{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+	   else
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+
+    `PWIN: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`CLEAR,9'b000000001};
+    `DWIN: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`CLEAR,9'b000000001};
+    `TIE:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`CLEAR,9'b000000001};
+    `CLEAR:{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`WAIT,9'b000000000};
+    default: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light,clearboard} = {`WAIT,9'b000000000};
+  endcase
+  end
+end
+
+
+/*always @(negedge slow_clock or negedge resetb) begin
+  if(resetb == 0)
+  	{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`WAIT,8'b0};
+  else begin
+  case (current_state)
+    `WAIT: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PC1,8'b0};
+    `PC1:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC1,8'b10000000};
+    `DC1:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PC2,8'b00010000};
+    `PC2:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC2,8'b01000000};
+    `DC2:  if (pscore==8 || pscore==9 || dscore==8 || dscore==9)
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00001000};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00001000};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00001000};
+	   else if (pscore >= 0 && pscore <= 5)
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PC3,8'b00001000};
+	   else	if (dscore >= 0 && dscore <= 5)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00001000};
+		else if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00001000};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00001000};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00001000};
+		    
+    `PC3:  if (dscore == 7)
+		if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00100000};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00100000};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00100000};
+	   else if (dscore == 6)
+		if (pcard3 == 6 || pcard3 == 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00100000};
+                else if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00100000};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00100000};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00100000};
+	   else if (dscore == 5)
+		if (pcard3 >= 4 && pcard3 <= 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00100000};
+                else if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00100000};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00100000};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00100000};
+	   else if (dscore == 4)
+		if (pcard3 >= 2 && pcard3 <= 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00100000};
+                else if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00100000};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00100000};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00100000};
+	   else if (dscore == 3)
+		if (pcard3 >= 0 && pcard3 <= 7)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00100000};
+                else if(pscore > dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00100000};
+		else if (pscore < dscore)
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00100000};
+		else
+			{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00100000};
+	   else 
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DC3,8'b00100000};
+	  
+
+    `DC3:  if(pscore > dscore)
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000100};
+	   else if (pscore < dscore)
+	 	{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000100};
+	   else
+		{next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000100};
+
+    `PWIN: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`PWIN,8'b00000010};
+    `DWIN: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`DWIN,8'b00000001};
+    `TIE:  {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`TIE,8'b00000011};
+    default: {next_state,load_pcard1,load_pcard2,load_pcard3,load_dcard1,load_dcard2,load_dcard3,player_win_light, dealer_win_light} = {`WAIT,8'b00000000};
+  endcase
+  end
+end*/
+endmodule
+			
